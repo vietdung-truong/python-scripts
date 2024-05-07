@@ -1,31 +1,43 @@
 import os
 import json
 
-def push_variables_to_next_dimension(input_json_path, output_json_path, variables_to_push):
-    # Load existing JSON data
-    with open(input_json_path, 'r') as file:
-        existing_data = json.load(file)
+def restructure_json(json_data):
+    # Recursive function to traverse and restructure JSON data
+    if isinstance(json_data, dict):
+        for key, value in json_data.items():
+            # If A or B are found, restructure them under variable C
+            for key in variables_to_push:
+                json_data[nest_variable] = {
+                    key: value
+                }
+                del json_data[key]
+            else:
+                # Recursively process nested dictionaries
+                restructure_json(value)
+    elif isinstance(json_data, list):
+        for item in json_data:
+            # Recursively process list items
+            restructure_json(item)
 
-    # Create a new dictionary for the updated structure
-    updated_data = {}
+def json_push_dimension():
 
-    # Iterate through the existing data
-    for key, value in existing_data.items():
-        # If the key is in the list of variables to push
-        if key in variables_to_push:
-            # Create a new dictionary for the variable and add it to the updated data
-            updated_data[key] = {"value": value}
-        else:
-            # Otherwise, add the key-value pair directly to the updated data
-            updated_data[key] = value
+    # Load input JSON data
+    with open(input_file_path, "r") as file:
+        json_data = json.load(file)
 
-    # Write the updated data to a new JSON file
-    with open(output_json_path, 'w') as file:
-        json.dump(updated_data, file, indent=4)
+    # Restructure JSON data
+    restructure_json(json_data)
+
+    # Write output JSON data to a new file
+    with open(output_file_path, "w") as file:
+        json.dump(json_data, file, indent=4)
+
+    print("JSON data restructured and saved to:", output_file_path)
 
 # Example usage:
-input_json_path = 'input.json'  # Path to the input JSON file
-output_json_path = 'output.json'  # Path to the output JSON file
-variables_to_push = ['name', 'age']  # List of variables to push to the next dimension
+input_file_path = r"C:\Users\vietdung.truong\Documents\Work\OCI project\Claudiu\infra-mapping.json"  # Path to the input JSON file
+output_file_path = r"C:\Users\vietdung.truong\Documents\Work\OCI project\Claudiu\infra-mappingoutput.json"  # Path to the output JSON file
+variables_to_push = ['vcn_dns_infra_resolver_destination', 'vcn_infra_subnet_cidr']  # List of variables to push to the next dimension
+nest_variable = 'name' #variable to nest the pushed variables
 
-push_variables_to_next_dimension(input_json_path, output_json_path, variables_to_push)
+json_push_dimension()
